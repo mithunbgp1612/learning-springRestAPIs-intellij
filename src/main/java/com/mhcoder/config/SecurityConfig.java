@@ -41,7 +41,10 @@ public class SecurityConfig {
 
                         // ✅ Role based access
                         .requestMatchers("/admin/**").hasRole("ADMIN")
-                        .requestMatchers("/users/**").hasAnyRole("USER", "ADMIN")
+//                        .requestMatchers("/users/**").hasAnyRole("USER", "ADMIN")
+                        .requestMatchers("/users/allUser").hasAnyRole("USER","ADMIN")
+                        .requestMatchers("/users/**").hasRole( "ADMIN")
+
 
                         // ✅ बाकी सब secure
                         .anyRequest().authenticated()
