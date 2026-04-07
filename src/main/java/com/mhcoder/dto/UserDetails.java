@@ -1,5 +1,6 @@
 package com.mhcoder.dto;
 
+import com.mhcoder.models.Role;
 import lombok.*;
 
 @Data
@@ -13,4 +14,6 @@ public class UserDetails {
     private String lastname;
     private String email;
     private String password;
+
+    private Role role;
 }

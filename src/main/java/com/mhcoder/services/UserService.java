@@ -1,6 +1,7 @@
 package com.mhcoder.services;
 
-import com.mhcoder.config.SpringConfig;
+import com.mhcoder.config.SecurityConfig;
+
 import com.mhcoder.dto.ExceptionResponse;
 import com.mhcoder.dto.UserDetails;
 import com.mhcoder.dto.UserLogin;
@@ -8,6 +9,10 @@ import com.mhcoder.models.User;
 import com.mhcoder.repository.UserReposistory;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -19,8 +24,15 @@ public class UserService {
     UserReposistory userReposistory;
 
     @Autowired
-    private SpringConfig springConfig;
+    private SecurityConfig springConfig;
+
+
+
     public ExceptionResponse createUser(UserDetails userDetails) {
+
+        if (userReposistory.existsByEmail(userDetails.getEmail())) {
+            throw new RuntimeException("Email already exists, try another email");
+        }
 
         User user=new User();
         user.setId(userDetails.getId());
@@ -29,6 +41,7 @@ public class UserService {
         user.setEmail(userDetails.getEmail());
         user.setPassword(userDetails.getPassword());
         user.setPassword(springConfig.passwordEncoder().encode(user.getPassword()));
+        user.setRole(userDetails.getRole());
         userReposistory.save(user);
 
         ExceptionResponse response=new ExceptionResponse();
@@ -46,14 +59,29 @@ public class UserService {
             throw new RuntimeException("Invalid password");
         }
 
+        // ✅ Authority set
+        List<GrantedAuthority> authorities =
+                List.of(new SimpleGrantedAuthority("ROLE_" + user.getRole().name()));
+        System.out.println("Role: " + user.getRole());
+        // ✅ Authentication object
+        UsernamePasswordAuthenticationToken auth =
+                new UsernamePasswordAuthenticationToken(user.getEmail(), null, authorities);
+
+        // ✅ Set into SecurityContext (MOST IMPORTANT)
+        SecurityContextHolder.getContext().setAuthentication(auth);
+
+        // ✅ Response object
         UserDetails userDetails = new UserDetails();
         userDetails.setId(user.getId());
         userDetails.setEmail(user.getEmail());
         userDetails.setFirstname(user.getFirstname());
         userDetails.setLastname(user.getLastname());
+        userDetails.setRole(user.getRole());
 
         return userDetails;
     }
+
+
     public ExceptionResponse updateUser(Long id, UserDetails userDetails) {
 
         User details = userReposistory.findById(id)
@@ -71,7 +99,8 @@ public class UserService {
     }
 
     public UserDetails getByUserId(Long id) {
-        User user=userReposistory.findById(id).orElseThrow(() -> new RuntimeException("User id not found : " + id));
+        User user=userReposistory.findById(id)
+                .orElseThrow(() -> new RuntimeException("User id not found : " + id));
         UserDetails details=new UserDetails();
         details.setId(user.getId());
         details.setFirstname(user.getFirstname());
@@ -87,7 +116,7 @@ public class UserService {
 
         userReposistory.deleteById(id);
         ExceptionResponse response=new ExceptionResponse();
-        response.setMessage("user Signup success..");
+        response.setMessage("user Data Delete success..");
         return response;
     }
 
@@ -105,7 +134,6 @@ public class UserService {
 
             userDetailsList.add(details);
         }
-
         return userDetailsList;
     }
 

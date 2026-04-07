@@ -13,7 +13,7 @@ import java.util.List;
 
 @CrossOrigin(origins = "*")
 @RestController
-@RequestMapping("/users/auth")
+@RequestMapping("/users")
 public class UserController {
 
     @Autowired
@@ -24,17 +24,10 @@ public class UserController {
         ExceptionResponse result=userService.createUser(userDetails);
         return new ResponseEntity<ExceptionResponse>(result,HttpStatus.CREATED);
     }
-    @PostMapping("/login")
-    public ResponseEntity<UserDetails> userLogin(@RequestBody UserLogin userLogin){
-        UserDetails userDetails=userService.userLogin(userLogin);
-        if (userDetails != null) {
-            return new ResponseEntity<UserDetails>(userDetails,HttpStatus.OK);
-        }
-        return new ResponseEntity<UserDetails>(userDetails,HttpStatus.UNAUTHORIZED);
-    }
 
     @GetMapping("/allUser")
     public ResponseEntity<List<UserDetails>> alluserData(){
+
         List<UserDetails> userDetails=userService.allUserData();
         return new ResponseEntity<>(userDetails,HttpStatus.OK);
     }
