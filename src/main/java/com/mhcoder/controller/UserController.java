@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @CrossOrigin(origins = "*")
 @RestController
@@ -36,6 +37,18 @@ public class UserController {
         ExceptionResponse userData=userService.updateUser(id,userDetails);
         return new ResponseEntity<ExceptionResponse>(userData,HttpStatus.CREATED);
     }
+    @PutMapping("/reset-password/{id}")
+    public ResponseEntity<ExceptionResponse> resetPassword(
+            @PathVariable Long id,
+            @RequestBody Map<String, String> request) {
+
+        String newPassword = request.get("newPassword");
+
+        ExceptionResponse response = userService.resetPassword(id, newPassword);
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+    @PostMapping()
 
     @GetMapping("/{id}")
     public ResponseEntity<UserDetails> getByUserId(@PathVariable Long id){

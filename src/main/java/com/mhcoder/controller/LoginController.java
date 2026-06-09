@@ -1,5 +1,6 @@
 package com.mhcoder.controller;
 
+import com.mhcoder.dto.ExceptionResponse;
 import com.mhcoder.dto.UserDetails;
 import com.mhcoder.dto.UserLogin;
 import com.mhcoder.services.UserService;
@@ -18,11 +19,19 @@ public class LoginController {
 
     @PostMapping("/login")
     public ResponseEntity<UserDetails> userLogin(@RequestBody UserLogin userLogin){
-        System.out.println("ROLE FROM REQUEST: " + userLogin.getRole()); // 👈 ADD THIS
+        System.out.println("ROLE FROM REQUEST: " + userLogin.getRole()); // ADD THIS
         UserDetails userDetails=userService.userLogin(userLogin);
         if (userDetails != null) {
             return new ResponseEntity<UserDetails>(userDetails, HttpStatus.OK);
         }
         return new ResponseEntity<UserDetails>(userDetails,HttpStatus.UNAUTHORIZED);
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<ExceptionResponse> logout() {
+
+        ExceptionResponse response = userService.logout();
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 }

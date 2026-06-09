@@ -14,6 +14,5 @@ public class UserLogin {
 
     private String email;
     private String password;
-
     private Role role;
 }

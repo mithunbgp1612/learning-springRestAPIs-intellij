@@ -26,8 +26,6 @@ public class UserService {
     @Autowired
     private SecurityConfig springConfig;
 
-
-
     public ExceptionResponse createUser(UserDetails userDetails) {
 
         if (userReposistory.existsByEmail(userDetails.getEmail())) {
@@ -81,6 +79,15 @@ public class UserService {
         return userDetails;
     }
 
+    public ExceptionResponse logout() {
+
+        SecurityContextHolder.clearContext();
+
+        ExceptionResponse response=new ExceptionResponse();
+        response.setMessage("User logged out successfully..");
+
+        return response;
+    }
 
     public ExceptionResponse updateUser(Long id, UserDetails userDetails) {
 
@@ -97,6 +104,8 @@ public class UserService {
         response.setMessage("user Signup success..");
         return response;
     }
+
+
 
     public UserDetails getByUserId(Long id) {
         User user=userReposistory.findById(id)
@@ -135,6 +144,22 @@ public class UserService {
             userDetailsList.add(details);
         }
         return userDetailsList;
+    }
+
+    // Reset Password manually
+    public ExceptionResponse resetPassword(Long id, String newPassword) {
+
+        User user = userReposistory.findById(id)
+                .orElseThrow(() -> new RuntimeException("User not found : " + id));
+
+        user.setPassword(springConfig.passwordEncoder().encode(newPassword));
+
+        userReposistory.save(user);
+
+        ExceptionResponse response = new ExceptionResponse();
+        response.setMessage("Password successfully reset");
+
+        return response;
     }
 
 }

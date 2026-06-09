@@ -45,11 +45,9 @@ public class SecurityConfig {
                         .requestMatchers("/users/allUser").hasAnyRole("USER","ADMIN")
                         .requestMatchers("/users/**").hasRole( "ADMIN")
 
-
                         // ✅ बाकी सब secure
                         .anyRequest().authenticated()
                 )
-
                 // ✅ Session stateless (important for API)
                 // ✅ Session MUST
                 .sessionManagement(session ->
@@ -63,7 +61,4 @@ public class SecurityConfig {
 
         return http.build();
     }
-
-
-
 }
